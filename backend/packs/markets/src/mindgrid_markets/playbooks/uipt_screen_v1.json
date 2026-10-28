@@ -1,0 +1,166 @@
+{
+  "id": "markets.uipt-screen",
+  "version": 1,
+  "status": "active",
+  "title": "Multi-timeframe screen",
+  "summary": "Stages every symbol on weekly, daily, 4-hour and hourly bars (kill switch, macro filter, pullback setup, hourly trigger), with the regime, sector flow and data checks.",
+  "translations": {
+    "th": {"title": "สกรีนหลายไทม์เฟรม",
+           "summary": "จัด stage ทุกตัวบนแท่งรายสัปดาห์ รายวัน 4 ชั่วโมง และรายชั่วโมง (kill switch ตัวกรองมหภาค จังหวะย่อ สัญญาณรายชั่วโมง) พร้อมภาวะตลาด เงินไหลรายกลุ่ม และการตรวจคุณภาพข้อมูล"}
+  },
+  "inputs": {
+    "bars_1w_part1": {
+      "type": "dataset",
+      "required": false,
+      "default": "bars-1w-part1",
+      "doc": "1w bars, part 1 (dataset name)."
+    },
+    "bars_1w_part2": {
+      "type": "dataset",
+      "required": false,
+      "default": "bars-1w-part2",
+      "doc": "1w bars, part 2 (dataset name)."
+    },
+    "bars_1d_part1": {
+      "type": "dataset",
+      "required": false,
+      "default": "bars-1d-part1",
+      "doc": "1d bars, part 1 (dataset name)."
+    },
+    "bars_1d_part2": {
+      "type": "dataset",
+      "required": false,
+      "default": "bars-1d-part2",
+      "doc": "1d bars, part 2 (dataset name)."
+    },
+    "bars_4h_part1": {
+      "type": "dataset",
+      "required": false,
+      "default": "bars-4h-part1",
+      "doc": "4h bars, part 1 (dataset name)."
+    },
+    "bars_4h_part2": {
+      "type": "dataset",
+      "required": false,
+      "default": "bars-4h-part2",
+      "doc": "4h bars, part 2 (dataset name)."
+    },
+    "bars_1h_part1": {
+      "type": "dataset",
+      "required": false,
+      "default": "bars-1h-part1",
+      "doc": "1h bars, part 1 (dataset name)."
+    },
+    "bars_1h_part2": {
+      "type": "dataset",
+      "required": false,
+      "default": "bars-1h-part2",
+      "doc": "1h bars, part 2 (dataset name)."
+    }
+  },
+  "params": {
+    "overrides": {
+      "type": "object",
+      "default": {},
+      "doc": "Threshold overrides (MarketParams fields, e.g. {\"stage\": {\"rsi_high\": 62}})."
+    },
+    "stages": {
+      "type": "array",
+      "default": [
+        "TRIGGER",
+        "SETUP",
+        "MACRO-WATCH",
+        "SETUP(loose)",
+        "REVERSAL"
+      ],
+      "doc": "Stages listed as candidates (strict stage or relaxed stage)."
+    },
+    "top_n": {
+      "type": "integer",
+      "default": 100,
+      "minimum": 1,
+      "maximum": 2000,
+      "doc": "Candidates returned."
+    }
+  },
+  "steps": [
+    {
+      "id": "screen",
+      "fn": "markets.screen.run",
+      "with": {
+        "w1": [
+          "$inputs.bars_1w_part1",
+          "$inputs.bars_1w_part2"
+        ],
+        "d1": [
+          "$inputs.bars_1d_part1",
+          "$inputs.bars_1d_part2"
+        ],
+        "h4": [
+          "$inputs.bars_4h_part1",
+          "$inputs.bars_4h_part2"
+        ],
+        "h1": [
+          "$inputs.bars_1h_part1",
+          "$inputs.bars_1h_part2"
+        ],
+        "overrides": "$params.overrides"
+      }
+    },
+    {
+      "id": "regime",
+      "fn": "markets.regime.summary",
+      "with": {
+        "screen": "$steps.screen.screen"
+      }
+    },
+    {
+      "id": "table",
+      "fn": "markets.screen.table",
+      "with": {
+        "screen": "$steps.screen.screen"
+      }
+    },
+    {
+      "id": "strict",
+      "fn": "core.table.filter",
+      "with": {
+        "rows": "$steps.table.rows",
+        "where": [
+          {
+            "column": "stage",
+            "op": "in",
+            "value": "$params.stages"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ranked",
+      "fn": "core.table.sort",
+      "with": {
+        "rows": "$steps.strict.rows",
+        "by": "rs60"
+      }
+    },
+    {
+      "id": "top",
+      "fn": "core.table.top",
+      "with": {
+        "rows": "$steps.ranked.rows",
+        "n": "$params.top_n"
+      }
+    }
+  ],
+  "outputs": {
+    "candidates": "$steps.top.rows",
+    "candidate_count": "$steps.strict.count",
+    "regime": "$steps.regime.regime",
+    "sectors": "$steps.regime.sectors",
+    "checks": "$steps.regime.checks",
+    "asof_by_tf": "$steps.regime.asof_by_tf",
+    "can_judge_daily_close": "$steps.regime.can_judge_daily_close",
+    "data_versions": "$steps.screen.data_versions"
+  },
+  "evidence": []
+}

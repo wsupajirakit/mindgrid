@@ -1,0 +1,22 @@
+# Lint + format rules for every Python file in the repo.
+line-length = 100
+target-version = "py314"
+src = ["backend/src", "backend/tests", "tools"]
+
+[lint]
+select = ["E", "W", "F", "I", "B", "UP", "S", "SIM", "RUF", "ASYNC", "PT", "PL", "N"]
+ignore = [
+    "PLR2004",  # magic-value comparison: thresholds live in Settings/specs, tests compare literals
+]
+
+[lint.per-file-ignores]
+"backend/tests/**" = ["S101", "S105", "S106", "PLR0913", "S603", "S607"]  # assert · test credentials · git fixtures
+"backend/packs/*/*_tests/**" = ["S101"]  # assert idiom
+"backend/migrations/**" = ["S608"]  # DDL assembled from module constants only, never input
+# A command's parameters are its CLI options: their count is the interface, not a smell.
+"backend/src/mindgrid/interfaces/cli/**" = ["PLR0913", "PLR0917"]
+# Same for a route: its parameters are the HTTP interface (path, query, form fields).
+"backend/src/mindgrid/interfaces/api/**" = ["PLR0913", "PLR0917"]
+
+[lint.isort]
+known-first-party = ["mindgrid"]

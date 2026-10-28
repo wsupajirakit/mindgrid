@@ -1,0 +1,13 @@
+{
+  "id": "generic-json",
+  "title": "Any JSON API",
+  "summary": "One endpoint returning a list of records (or an object holding one at a dot path).",
+  "spec": {
+    "base_url": "https://api.example.com",
+    "auth": {"type": "header", "secret": "connector.example.key", "name": "X-Api-Key"},
+    "resources": [
+      {"dataset": "records", "path": "/v1/records", "format": "json", "records_path": "data"}
+    ]
+  },
+  "every_minutes": null
+}

@@ -1,0 +1,21 @@
+[project]
+name = "mindgrid-markets"
+version = "0.1.0"
+description = "Markets pack: multi-timeframe screens, staging, regime, setups and sizing as engine functions and playbooks."
+requires-python = ">=3.14"
+dependencies = [
+    "numpy>=2.5.4,<3",
+    "pandas>=3.0.6,<4",
+]
+
+# The engine finds the pack through these entry points; the pack imports only the engine's
+# `core` and `functions` contracts.
+[project.entry-points."mindgrid.functions"]
+markets = "mindgrid_markets.functions"
+
+[project.entry-points."mindgrid.playbooks"]
+markets = "mindgrid_markets.playbooks"
+
+[build-system]
+requires = ["uv_build>=0.13,<0.14"]
+build-backend = "uv_build"

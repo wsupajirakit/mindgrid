@@ -1,0 +1,6 @@
+# Publish the API on this host (127.0.0.1 only; put a TLS reverse proxy in front). Hosting
+# panels do not need this file: their proxy reaches the api service inside the network.
+#   docker compose --env-file deploy/.env -f compose.yaml -f deploy/compose.local.yaml up -d
+services:
+  api:
+    ports: ["127.0.0.1:${MINDGRID_HTTP_PORT:-8700}:8700"]

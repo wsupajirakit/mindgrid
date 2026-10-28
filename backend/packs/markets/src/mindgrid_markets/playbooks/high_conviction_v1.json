@@ -1,0 +1,129 @@
+{
+  "id": "markets.high-conviction",
+  "version": 1,
+  "status": "active",
+  "title": "High conviction",
+  "summary": "Conviction 0-10 from stage weight, weekly/daily/hourly flow alignment, distance to pivot, relative strength and extension penalties.",
+  "translations": {
+    "th": {"title": "ความมั่นใจสูง",
+           "summary": "คะแนนความมั่นใจ 0–10 จากน้ำหนัก stage ความสอดคล้องของเงินไหลเข้ารายสัปดาห์/รายวัน/รายชั่วโมง ระยะถึงจุด pivot ความแข็งแกร่งเทียบตลาด และหักคะแนนเมื่อราคาวิ่งไกลเกิน"}
+  },
+  "inputs": {
+    "bars_1w_part1": {
+      "type": "dataset",
+      "required": false,
+      "default": "bars-1w-part1",
+      "doc": "1w bars, part 1 (dataset name)."
+    },
+    "bars_1w_part2": {
+      "type": "dataset",
+      "required": false,
+      "default": "bars-1w-part2",
+      "doc": "1w bars, part 2 (dataset name)."
+    },
+    "bars_1d_part1": {
+      "type": "dataset",
+      "required": false,
+      "default": "bars-1d-part1",
+      "doc": "1d bars, part 1 (dataset name)."
+    },
+    "bars_1d_part2": {
+      "type": "dataset",
+      "required": false,
+      "default": "bars-1d-part2",
+      "doc": "1d bars, part 2 (dataset name)."
+    },
+    "bars_4h_part1": {
+      "type": "dataset",
+      "required": false,
+      "default": "bars-4h-part1",
+      "doc": "4h bars, part 1 (dataset name)."
+    },
+    "bars_4h_part2": {
+      "type": "dataset",
+      "required": false,
+      "default": "bars-4h-part2",
+      "doc": "4h bars, part 2 (dataset name)."
+    },
+    "bars_1h_part1": {
+      "type": "dataset",
+      "required": false,
+      "default": "bars-1h-part1",
+      "doc": "1h bars, part 1 (dataset name)."
+    },
+    "bars_1h_part2": {
+      "type": "dataset",
+      "required": false,
+      "default": "bars-1h-part2",
+      "doc": "1h bars, part 2 (dataset name)."
+    }
+  },
+  "params": {
+    "overrides": {
+      "type": "object",
+      "default": {},
+      "doc": "Threshold overrides (MarketParams fields, e.g. {\"stage\": {\"rsi_high\": 62}})."
+    },
+    "min_score": {
+      "type": "number",
+      "default": 6.0,
+      "minimum": 0,
+      "maximum": 10,
+      "doc": "Lowest score listed."
+    },
+    "relaxed": {
+      "type": "boolean",
+      "default": false,
+      "doc": "Score the relaxed (ez) stage instead of the strict one."
+    }
+  },
+  "steps": [
+    {
+      "id": "screen",
+      "fn": "markets.screen.run",
+      "with": {
+        "w1": [
+          "$inputs.bars_1w_part1",
+          "$inputs.bars_1w_part2"
+        ],
+        "d1": [
+          "$inputs.bars_1d_part1",
+          "$inputs.bars_1d_part2"
+        ],
+        "h4": [
+          "$inputs.bars_4h_part1",
+          "$inputs.bars_4h_part2"
+        ],
+        "h1": [
+          "$inputs.bars_1h_part1",
+          "$inputs.bars_1h_part2"
+        ],
+        "overrides": "$params.overrides"
+      }
+    },
+    {
+      "id": "regime",
+      "fn": "markets.regime.summary",
+      "with": {
+        "screen": "$steps.screen.screen"
+      }
+    },
+    {
+      "id": "scored",
+      "fn": "markets.setup.conviction",
+      "with": {
+        "screen": "$steps.screen.screen",
+        "overrides": "$params.overrides",
+        "min_score": "$params.min_score",
+        "relaxed": "$params.relaxed"
+      }
+    }
+  ],
+  "outputs": {
+    "names": "$steps.scored.rows",
+    "count": "$steps.scored.count",
+    "permission": "$steps.regime.regime.permission",
+    "data_versions": "$steps.screen.data_versions"
+  },
+  "evidence": []
+}

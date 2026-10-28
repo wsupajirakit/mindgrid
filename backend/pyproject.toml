@@ -1,0 +1,89 @@
+[project]
+name = "mindgrid"
+version = "0.1.0"
+description = "General-purpose retrieval and reasoning engine: knowledge, datasets, functions and playbooks."
+requires-python = ">=3.14,<3.15"
+dependencies = [
+    "fastapi>=0.140,<1",
+    "uvicorn>=0.50,<1",
+    "pydantic[email]>=2.14,<3",
+    "pydantic-settings>=2.16,<3",
+    "structlog>=26.1",
+    "sqlalchemy[asyncio]>=2.1,<2.2",
+    "asyncpg>=0.31,<1",
+    "alembic>=1.18,<2",
+    "argon2-cffi>=25.1,<26",
+    "typer>=0.25,<1",
+    "cryptography>=50.0.2,<51",
+    "pypdf>=6.21.2,<7",
+    "python-multipart>=0.0.20",
+    "http-sfv>=0.9.9,<1",
+    "pgvector>=0.5,<0.6",
+    "fastembed>=0.9,<0.10",
+    "google-genai>=2.31,<3",
+    "httpx>=0.28.1,<0.29",
+    "mcp>=2.3,<3",
+    "mindgrid-markets",
+]
+
+[project.scripts]
+mindgrid = "mindgrid.interfaces.cli.main:app"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1,<10",
+    "httpx2>=2.13,<3",
+    "ruff>=0.17,<0.18",
+    "pyright>=1.1.414",
+]
+
+[build-system]
+requires = ["uv_build>=0.13,<0.14"]
+build-backend = "uv_build"
+
+[tool.uv.workspace]
+members = ["packs/*"]
+
+[tool.uv.sources]
+mindgrid-markets = { workspace = true }
+
+[tool.uv]
+# Supply-chain rule: only releases at least 7 days old (move the date forward on purpose,
+# in its own commit; a younger release is allowed only to fix a known advisory).
+exclude-newer = "2026-10-18T00:00:00Z"
+# Security exceptions (younger than the cutoff, earliest release fixing the advisories):
+#   pypdf 6.21.2 — GHSA-6c7f-9265-g8fw, GHSA-gmh7-3g9r-mjh5, GHSA-jr96-gvgh-j3r4 (runtime DoS)
+#   certifi 2026.10.19 — GHSA-6q48-6c7w-9gw2 (critical: drops CAs whose keys were compromised)
+exclude-newer-package = { pypdf = "2026-10-22T00:00:00Z", certifi = "2026-10-21T00:00:00Z" }
+constraint-dependencies = ["certifi>=2026.10.19"]
+# fastembed caps pillow below 13, which pins 41 advisories (fixed in 13.0.0). Pillow is used
+# only by fastembed's image models, never by text embedding (tests/knowledge/test_embed_import.py).
+override-dependencies = ["pillow>=13.0.0"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests", "packs/markets/markets_tests"]
+addopts = "-q -p no:cacheprovider --strict-markers"
+markers = [
+  "db: needs the test PostgreSQL database",
+  "parity: compares a pack with its source system (needs MINDGRID_PARITY_* paths)",
+]
+filterwarnings = [
+  "error",
+  # google-genai on Python 3.14 (third-party, import time); remove when it stops warning.
+  "ignore:'_UnionGenericAlias' is deprecated:DeprecationWarning",
+]
+
+[tool.pyright]
+include = ["src", "tests", "packs"]
+venvPath = "."
+venv = ".venv"
+# Packs work on pandas frames, whose columns are untyped: strict otherwise, without the
+# "partially unknown" reports that every column access would raise.
+executionEnvironments = [
+  { root = "src" },
+  { root = "tests", extraPaths = ["src"] },
+  { root = "packs", extraPaths = ["src"], reportUnknownMemberType = false, reportUnknownArgumentType = false, reportUnknownVariableType = false, reportUnknownLambdaType = false, reportUnknownParameterType = false },
+]
+pythonVersion = "3.14"
+typeCheckingMode = "strict"
+reportMissingTypeStubs = false

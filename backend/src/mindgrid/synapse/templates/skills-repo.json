@@ -1,0 +1,20 @@
+{
+  "id": "skills-repo",
+  "title": "Agent skills repository",
+  "summary": "Skill instructions as rules, references as evidence, scripts as code tasks for a pack; data, state, history and personal folders are never read.",
+  "mapping": {
+    "include": ["**/*.md", "**/*.py", "**/*.json", "**/*.yaml", "**/*.yml"],
+    "exclude": ["**/.venv/**", "**/node_modules/**", "**/__pycache__/**", "**/*.csv", "**/*.lock",
+                "**/history/**", "**/archive/**", "**/*_archive/**", "**/audit/**"],
+    "rules": [
+      {"glob": "**/SKILL.md", "kind": "rules"},
+      {"glob": "**/references/*.md", "kind": "evidence"},
+      {"glob": "**/README.md", "kind": "docs"},
+      {"glob": "**/scripts/*.py", "kind": "code", "target": "pack"},
+      {"glob": "**/*.py", "kind": "code", "target": "pack"},
+      {"glob": "**/*.md", "kind": "docs"}
+    ],
+    "redact": [],
+    "drop_lines": []
+  }
+}

@@ -1,0 +1,124 @@
+{
+  "id": "markets.short-rank",
+  "version": 1,
+  "status": "active",
+  "title": "Near-pivot readiness",
+  "summary": "Live names at or just under their 15-bar pivot with positive hourly flow: breakout entry, stop at least 1.5 ATR under it, target capped by the nearest swing high.",
+  "translations": {
+    "th": {"title": "ใกล้จุดเบรก pivot",
+           "summary": "หุ้นที่ราคาอยู่ที่หรือต่ำกว่า pivot 15 แท่งเล็กน้อย และเงินไหลเข้ารายชั่วโมงเป็นบวก: เข้าเมื่อเบรก stop อย่างน้อย 1.5 ATR ใต้จุดเข้า เป้าไม่เกินจุดสูงสุดของ swing ที่ใกล้ที่สุด"}
+  },
+  "inputs": {
+    "bars_1w_part1": {
+      "type": "dataset",
+      "required": false,
+      "default": "bars-1w-part1",
+      "doc": "1w bars, part 1 (dataset name)."
+    },
+    "bars_1w_part2": {
+      "type": "dataset",
+      "required": false,
+      "default": "bars-1w-part2",
+      "doc": "1w bars, part 2 (dataset name)."
+    },
+    "bars_1d_part1": {
+      "type": "dataset",
+      "required": false,
+      "default": "bars-1d-part1",
+      "doc": "1d bars, part 1 (dataset name)."
+    },
+    "bars_1d_part2": {
+      "type": "dataset",
+      "required": false,
+      "default": "bars-1d-part2",
+      "doc": "1d bars, part 2 (dataset name)."
+    },
+    "bars_4h_part1": {
+      "type": "dataset",
+      "required": false,
+      "default": "bars-4h-part1",
+      "doc": "4h bars, part 1 (dataset name)."
+    },
+    "bars_4h_part2": {
+      "type": "dataset",
+      "required": false,
+      "default": "bars-4h-part2",
+      "doc": "4h bars, part 2 (dataset name)."
+    },
+    "bars_1h_part1": {
+      "type": "dataset",
+      "required": false,
+      "default": "bars-1h-part1",
+      "doc": "1h bars, part 1 (dataset name)."
+    },
+    "bars_1h_part2": {
+      "type": "dataset",
+      "required": false,
+      "default": "bars-1h-part2",
+      "doc": "1h bars, part 2 (dataset name)."
+    }
+  },
+  "params": {
+    "overrides": {
+      "type": "object",
+      "default": {},
+      "doc": "Threshold overrides (MarketParams fields, e.g. {\"stage\": {\"rsi_high\": 62}})."
+    },
+    "top_n": {
+      "type": "integer",
+      "default": 20,
+      "minimum": 1,
+      "maximum": 500,
+      "doc": "Names returned."
+    }
+  },
+  "steps": [
+    {
+      "id": "screen",
+      "fn": "markets.screen.run",
+      "with": {
+        "w1": [
+          "$inputs.bars_1w_part1",
+          "$inputs.bars_1w_part2"
+        ],
+        "d1": [
+          "$inputs.bars_1d_part1",
+          "$inputs.bars_1d_part2"
+        ],
+        "h4": [
+          "$inputs.bars_4h_part1",
+          "$inputs.bars_4h_part2"
+        ],
+        "h1": [
+          "$inputs.bars_1h_part1",
+          "$inputs.bars_1h_part2"
+        ],
+        "overrides": "$params.overrides"
+      }
+    },
+    {
+      "id": "regime",
+      "fn": "markets.regime.summary",
+      "with": {
+        "screen": "$steps.screen.screen"
+      }
+    },
+    {
+      "id": "rank",
+      "fn": "markets.setup.rank_short",
+      "with": {
+        "screen": "$steps.screen.screen",
+        "overrides": "$params.overrides",
+        "top_n": "$params.top_n"
+      }
+    }
+  ],
+  "outputs": {
+    "ranked": "$steps.rank.rows",
+    "ranked_count": "$steps.rank.count",
+    "permission": "$steps.regime.regime.permission",
+    "can_judge_daily_close": "$steps.regime.can_judge_daily_close",
+    "data_versions": "$steps.screen.data_versions"
+  },
+  "evidence": []
+}

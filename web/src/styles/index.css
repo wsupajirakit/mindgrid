@@ -1,0 +1,232 @@
+@import "tailwindcss";
+
+/* shadcn-style tokens: one set of roles, each theme only swaps values. Components use the
+   semantic utilities generated below (bg-card, text-muted-foreground, border-border, ...).
+   --brand / --brand-dark come from the server's brand config (useBrand) and drive the primary
+   colour of the light and dark themes. */
+:root,
+:root[data-theme="light"] {
+  --glow-danger: color-mix(in oklab, var(--destructive) 40%, transparent);
+  --glow-selected: color-mix(in oklab, var(--primary) 35%, transparent);
+  --glow-hover: color-mix(in oklab, var(--hue-2) 30%, transparent);
+  color-scheme: light;
+  --radius: 0.65rem;
+  --background: #fafafa;
+  --foreground: #09090b;
+  --card: #ffffff;
+  --card-foreground: #09090b;
+  --popover: #ffffff;
+  --popover-foreground: #09090b;
+  --primary: var(--brand, #4f46e5);
+  --primary-foreground: #ffffff;
+  --secondary: #f4f4f5;
+  --secondary-foreground: #18181b;
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
+  --accent: #eef0ff;
+  --accent-foreground: #312e81;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --success: #15803d;
+  --warning: #b45309;
+  --border: #e4e4e7;
+  --input: #e4e4e7;
+  --ring: #6366f1;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #3f3f46;
+  --sidebar-accent: #f4f4f5;
+  --sidebar-border: #e4e4e7;
+  /* charts (validated categorical order; status colours are fixed) */
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+  --series-4: #eda100;
+  --series-5: #e87ba4;
+  --series-6: #008300;
+  --status-good: #0ca30c;
+  --status-critical: #d03b3b;
+  --grid: #e4e4e7;
+  --overlay: rgb(9 9 11 / 0.55);
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.05), 0 1px 3px rgb(0 0 0 / 0.06);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --glow-danger: color-mix(in oklab, var(--destructive) 55%, transparent);
+  --glow-selected: color-mix(in oklab, var(--primary) 45%, transparent);
+  --glow-hover: color-mix(in oklab, var(--hue-2) 40%, transparent);
+  --background: #09090b;
+  --foreground: #fafafa;
+  --card: #18181b;
+  --card-foreground: #fafafa;
+  --popover: #18181b;
+  --popover-foreground: #fafafa;
+  --primary: var(--brand-dark, #60a5fa);
+  --primary-foreground: #0b0b14;
+  --secondary: #27272a;
+  --secondary-foreground: #fafafa;
+  --muted: #27272a;
+  --muted-foreground: #a1a1aa;
+  --accent: #172236;
+  --accent-foreground: #bfdbfe;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --border: #27272a;
+  --input: #3f3f46;
+  --ring: #60a5fa;
+  --sidebar: #0f0f12;
+  --sidebar-foreground: #d4d4d8;
+  --sidebar-accent: #1f1f24;
+  --sidebar-border: #27272a;
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --series-3: #199e70;
+  --series-4: #c98500;
+  --series-5: #d55181;
+  --series-6: #008300;
+  --grid: #2c2c30;
+  --overlay: rgb(0 0 0 / 0.7);
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.4);
+}
+
+
+/* Decorative art (avatars, card covers, initials): the same in both themes. */
+:root {
+  --av-aurora-a: #6366f1; --av-aurora-b: #22d3ee;
+  --av-sunset-a: #f97316; --av-sunset-b: #db2777;
+  --av-ocean-a: #0ea5e9; --av-ocean-b: #1e3a8a;
+  --av-forest-a: #22c55e; --av-forest-b: #065f46;
+  --av-orchid-a: #c084fc; --av-orchid-b: #7c3aed;
+  --av-ember-a: #f59e0b; --av-ember-b: #b91c1c;
+  --av-lagoon-a: #2dd4bf; --av-lagoon-b: #0369a1;
+  --av-midnight-a: #334155; --av-midnight-b: #020617;
+  --av-citrus-a: #facc15; --av-citrus-b: #16a34a;
+  --av-berry-a: #f472b6; --av-berry-b: #9d174d;
+  --av-glacier-a: #e0f2fe; --av-glacier-b: #38bdf8;
+  --av-dune-a: #fde68a; --av-dune-b: #c2410c;
+  --cover-0-a: #4f46e5; --cover-0-b: #06b6d4;
+  --cover-1-a: #7c3aed; --cover-1-b: #ec4899;
+  --cover-2-a: #0ea5e9; --cover-2-b: #22c55e;
+  --cover-3-a: #f97316; --cover-3-b: #e11d48;
+  --cover-4-a: #14b8a6; --cover-4-b: #6366f1;
+  --cover-5-a: #f59e0b; --cover-5-b: #84cc16;
+  --cover-6-a: #8b5cf6; --cover-6-b: #0ea5e9;
+  --cover-7-a: #db2777; --cover-7-b: #f97316;
+  --hue-0: #6366f1;
+  --hue-1: #0ea5e9;
+  --hue-2: #14b8a6;
+  --hue-3: #f59e0b;
+  --hue-4: #ec4899;
+  --hue-5: #8b5cf6;
+  --hue-6: #22c55e;
+  --ink-20: rgb(255 255 255 / 0.2); --ink-35: rgb(255 255 255 / 0.35);
+  --ink-45: rgb(255 255 255 / 0.45); --ink-60: rgb(255 255 255 / 0.6);
+}
+
+
+/* Knowledge network scene: always a deep-blue canvas (both themes), glowing nodes. */
+:root {
+  --net-bg-1: #0b1a3a; --net-bg-2: #050b1c;
+  --net-node: #60a5fa; --net-node-core: #dbeafe; --net-glow: #3b82f6;
+  --net-category: #34d399; --net-project: #a78bfa;
+  --net-link: #60a5fa; --net-hot: #f472b6; --net-text: #dbeafe; --net-dim: #64748b;
+  --net-dust: #93c5fd;
+}
+@keyframes net-flow { to { stroke-dashoffset: -32 } }
+.net-flow { animation: net-flow 2.4s linear infinite }
+@keyframes net-pulse { 50% { opacity: 0.55 } }
+.net-pulse { animation: net-pulse 3s ease-in-out infinite }
+@media (prefers-reduced-motion: reduce) { .net-flow, .net-pulse { animation: none } }
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-overlay: var(--overlay);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --shadow-card: var(--shadow);
+}
+
+* {
+  border-color: var(--border);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Overlay and content motion for dialogs, sheets, menus and toasts (Radix data-state). */
+/* Glow: the selected item glows in the primary colour; anything clickable glows teal on
+   hover (a different colour, so "can press" never looks like "chosen"). */
+@utility glow-hover {
+  transition: box-shadow 150ms ease, background-color 150ms ease;
+  &:hover { box-shadow: 0 0 0 1px var(--hue-2), 0 0 18px var(--glow-hover) }
+}
+@utility glow-select {
+  box-shadow: 0 0 0 1px var(--primary), 0 0 20px var(--glow-selected);
+  &:hover { box-shadow: 0 0 0 1px var(--primary), 0 0 24px var(--glow-selected) }
+}
+
+@keyframes mg-fade-in { from { opacity: 0 } to { opacity: 1 } }
+/* Opacity and scale only: centring uses the `translate` property, which a transform in the
+   keyframes would add to (the box would start off-centre and jump back). */
+@keyframes mg-zoom-in { from { opacity: 0; scale: 0.96 } to { opacity: 1; scale: 1 } }
+@keyframes mg-slide-in { from { transform: translateX(-100%) } to { transform: translateX(0) } }
+@keyframes mg-pop { from { opacity: 0; transform: translateY(6px) scale(0.98) }
+  to { opacity: 1; transform: none } }
+.mg-fade[data-state="open"] { animation: mg-fade-in 150ms ease-out }
+.mg-zoom[data-state="open"] { animation: mg-zoom-in 160ms ease-out }
+.mg-slide[data-state="open"] { animation: mg-slide-in 200ms ease-out }
+.mg-pop[data-state="open"], .mg-pop[data-state="delayed-open"] { animation: mg-pop 140ms ease-out }
+
+/* Loading: an indeterminate bar that sweeps across its track, and a soft sheen that runs
+   over a busy button. */
+@keyframes mg-progress { from { transform: translateX(-100%) } to { transform: translateX(260%) } }
+@keyframes mg-sheen { from { transform: translateX(-100%) } to { transform: translateX(100%) } }
+.mg-progress { animation: mg-progress 1.15s cubic-bezier(0.65, 0, 0.35, 1) infinite }
+.mg-sheen::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(100deg, transparent 20%, rgb(255 255 255 / 0.28) 50%,
+    transparent 80%);
+  animation: mg-sheen 1.3s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mg-fade, .mg-zoom, .mg-slide, .mg-pop, .mg-progress { animation: none !important }
+  .mg-sheen::after { animation: none }
+}

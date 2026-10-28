@@ -1,0 +1,123 @@
+{
+  "id": "markets.coiled-spring",
+  "version": 1,
+  "status": "provisional",
+  "title": "Coiled spring (6-12 months)",
+  "summary": "Not-extended names (EMA200 extension -20..+12%) coiling with quiet accumulation and room to the 60-bar high, lowest risk first. Provisional until its forward results are measured on this engine's data.",
+  "translations": {
+    "th": {"title": "สปริงขดรอดีด (6–12 เดือน)",
+           "summary": "หุ้นที่ยังไม่วิ่งไกลเกิน (ห่าง EMA200 −20..+12%) กำลังบีบตัวพร้อมการสะสมเงียบ ๆ และยังมีที่ว่างถึงจุดสูงสุด 60 แท่ง เรียงจากความเสี่ยงต่ำสุดก่อน สถานะทดลองจนกว่าจะวัดผลจริงย้อนหลังบนข้อมูลของระบบนี้"}
+  },
+  "inputs": {
+    "bars_1w_part1": {
+      "type": "dataset",
+      "required": false,
+      "default": "bars-1w-part1",
+      "doc": "1w bars, part 1 (dataset name)."
+    },
+    "bars_1w_part2": {
+      "type": "dataset",
+      "required": false,
+      "default": "bars-1w-part2",
+      "doc": "1w bars, part 2 (dataset name)."
+    },
+    "bars_1d_part1": {
+      "type": "dataset",
+      "required": false,
+      "default": "bars-1d-part1",
+      "doc": "1d bars, part 1 (dataset name)."
+    },
+    "bars_1d_part2": {
+      "type": "dataset",
+      "required": false,
+      "default": "bars-1d-part2",
+      "doc": "1d bars, part 2 (dataset name)."
+    },
+    "bars_4h_part1": {
+      "type": "dataset",
+      "required": false,
+      "default": "bars-4h-part1",
+      "doc": "4h bars, part 1 (dataset name)."
+    },
+    "bars_4h_part2": {
+      "type": "dataset",
+      "required": false,
+      "default": "bars-4h-part2",
+      "doc": "4h bars, part 2 (dataset name)."
+    },
+    "bars_1h_part1": {
+      "type": "dataset",
+      "required": false,
+      "default": "bars-1h-part1",
+      "doc": "1h bars, part 1 (dataset name)."
+    },
+    "bars_1h_part2": {
+      "type": "dataset",
+      "required": false,
+      "default": "bars-1h-part2",
+      "doc": "1h bars, part 2 (dataset name)."
+    }
+  },
+  "params": {
+    "overrides": {
+      "type": "object",
+      "default": {},
+      "doc": "Threshold overrides (MarketParams fields, e.g. {\"stage\": {\"rsi_high\": 62}})."
+    },
+    "max_risk": {
+      "type": "number",
+      "default": 6.0,
+      "minimum": 0,
+      "maximum": 10,
+      "doc": "Highest risk score listed (0 = safest)."
+    }
+  },
+  "steps": [
+    {
+      "id": "screen",
+      "fn": "markets.screen.run",
+      "with": {
+        "w1": [
+          "$inputs.bars_1w_part1",
+          "$inputs.bars_1w_part2"
+        ],
+        "d1": [
+          "$inputs.bars_1d_part1",
+          "$inputs.bars_1d_part2"
+        ],
+        "h4": [
+          "$inputs.bars_4h_part1",
+          "$inputs.bars_4h_part2"
+        ],
+        "h1": [
+          "$inputs.bars_1h_part1",
+          "$inputs.bars_1h_part2"
+        ],
+        "overrides": "$params.overrides"
+      }
+    },
+    {
+      "id": "regime",
+      "fn": "markets.regime.summary",
+      "with": {
+        "screen": "$steps.screen.screen"
+      }
+    },
+    {
+      "id": "springs",
+      "fn": "markets.setup.coiled_spring",
+      "with": {
+        "screen": "$steps.screen.screen",
+        "overrides": "$params.overrides",
+        "max_risk": "$params.max_risk"
+      }
+    }
+  ],
+  "outputs": {
+    "springs": "$steps.springs.rows",
+    "count": "$steps.springs.count",
+    "permission": "$steps.regime.regime.permission",
+    "data_versions": "$steps.screen.data_versions"
+  },
+  "evidence": []
+}

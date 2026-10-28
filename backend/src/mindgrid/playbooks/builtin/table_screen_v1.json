@@ -1,0 +1,28 @@
+{
+  "id": "core.table-screen",
+  "version": 1,
+  "status": "active",
+  "title": "Screen a table",
+  "summary": "Keep the rows above a minimum in one column, rank them by another and return the top rows.",
+  "translations": {
+    "th": {"title": "คัดกรองตาราง",
+           "summary": "เก็บเฉพาะแถวที่ค่าคอลัมน์หนึ่งไม่ต่ำกว่าเกณฑ์ จัดอันดับด้วยอีกคอลัมน์ แล้วคืนแถวอันดับต้น ๆ"}
+  },
+  "inputs": {
+    "rows": {"type": "array", "doc": "The table: a list of JSON objects."}
+  },
+  "params": {
+    "filter_column": {"type": "string", "default": "score", "doc": "Column the minimum applies to."},
+    "minimum": {"type": "number", "default": 0, "doc": "Rows below this value are dropped."},
+    "rank_by": {"type": "string", "default": "score", "doc": "Column to rank by (highest first)."},
+    "top_n": {"type": "integer", "default": 10, "minimum": 1, "maximum": 1000, "doc": "Rows returned."}
+  },
+  "steps": [
+    {"id": "kept", "fn": "core.table.filter",
+     "with": {"rows": "$inputs.rows",
+              "where": [{"column": "$params.filter_column", "op": "ge", "value": "$params.minimum"}]}},
+    {"id": "ranked", "fn": "core.table.sort", "with": {"rows": "$steps.kept.rows", "by": "$params.rank_by"}},
+    {"id": "top", "fn": "core.table.top", "with": {"rows": "$steps.ranked.rows", "n": "$params.top_n"}}
+  ],
+  "outputs": {"rows": "$steps.top.rows", "matched": "$steps.kept.count"}
+}

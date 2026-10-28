@@ -1,0 +1,22 @@
+{
+  "id": "zservice-exports",
+  "title": "Market data service exports (CSV bars and rules)",
+  "summary": "Multi-timeframe OHLCV bars with indicators (two parts per timeframe) and the formula sheet. Needs a read key sent as a bearer token.",
+  "spec": {
+    "base_url": "https://YOUR-HOST",
+    "auth": {"type": "bearer", "secret": "connector.zservice.token"},
+    "resources": [
+      {"dataset": "bars-1w-part1", "path": "/api/export", "query": {"interval": "1w", "part": "1"}, "format": "csv", "title": "Weekly bars, part 1"},
+      {"dataset": "bars-1w-part2", "path": "/api/export", "query": {"interval": "1w", "part": "2"}, "format": "csv", "title": "Weekly bars, part 2"},
+      {"dataset": "bars-1d-part1", "path": "/api/export", "query": {"interval": "1d", "part": "1"}, "format": "csv", "title": "Daily bars, part 1"},
+      {"dataset": "bars-1d-part2", "path": "/api/export", "query": {"interval": "1d", "part": "2"}, "format": "csv", "title": "Daily bars, part 2"},
+      {"dataset": "bars-4h-part1", "path": "/api/export", "query": {"interval": "4h", "part": "1"}, "format": "csv", "title": "4-hour bars, part 1"},
+      {"dataset": "bars-4h-part2", "path": "/api/export", "query": {"interval": "4h", "part": "2"}, "format": "csv", "title": "4-hour bars, part 2"},
+      {"dataset": "bars-1h-part1", "path": "/api/export", "query": {"interval": "1h", "part": "1"}, "format": "csv", "title": "Hourly bars, part 1"},
+      {"dataset": "bars-1h-part2", "path": "/api/export", "query": {"interval": "1h", "part": "2"}, "format": "csv", "title": "Hourly bars, part 2"},
+      {"dataset": "formula", "path": "/api/export_formula", "format": "csv", "title": "Formula and rules sheet"}
+    ],
+    "timeout_seconds": 300
+  },
+  "every_minutes": 60
+}
